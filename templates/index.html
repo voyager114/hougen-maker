@@ -12,36 +12,39 @@ input,select,button{padding:.5rem;font-size:1rem}
   <option>仙台弁</option><option>津軽弁</option>
 </select>
   <label style="display:block;margin:1rem 0">
-    ノリの強さ: <span id="tval">0.3</span>
-    <input id="temp" type="range" min="0" max="1" step="0.05" value="0.3"
-           oninput="tval.textContent=this.value"
-           title="左＝カッチリ直訳 / 右＝めちゃ自由に方言化">
-    <small style="display:block;color:#666">← カッチリ | 自由 →</small>
-  </label>
+    <label>方言の強さ:
+      <select id="temp">
+        <option value="0.2">ほどほど(0.2)</option>
+        <option value="0.5" selected>ふつう(0.5)</option>
+        <option value="0.8">こてこて(0.8)</option>
+      </select>
+    </label>
 
 
 
-<button onclick="convert()">変換する</button>
-<div id="out"></div>
-<script>
-  async function convert(){
-    const text = txt.value.trim();
-    if(!text){ alert("文章を入力してね"); return; }
 
-    out.textContent = "…変換中";
+    ...
+    <button onclick="convert()">変換する</button>
 
-    const res = await fetch("/convert", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        text,
-        dialect: dial.value,
-        temperature: parseFloat(temp.value)   // ★ 追加
-      })
-    });
+    <div id="out"></div>
 
-    const j = await res.json();
-    out.textContent = j.result;
-  }
+    <script>
+      async function convert () {
+        const txt  = document.getElementById("txt").value.trim();
+        const dial = document.getElementById("dial").value;
+        const temperature = parseFloat(document.getElementById("temp").value);   // ← 追加
 
-</script></body></html>
+        if (!txt) { document.getElementById("out").textContent = "入力してください"; return; }
+
+        const res = await fetch("/convert", {
+          method : "POST",
+          headers: { "Content-Type": "application/json" },
+          body   : JSON.stringify({ text: txt, dialect: dial, temperature })
+        });
+
+        const data = await res.json();
+        document.getElementById("out").textContent = data.result;
+      }
+    </script>
+    </body>
+    </html>
